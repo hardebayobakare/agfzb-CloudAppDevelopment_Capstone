@@ -45,6 +45,21 @@ class CarDealer:
         self.zip = zip
     def __str__(self):
         return "Dealer name: " + self.full_name
+    def getfull_name(self):
+        return self.full_name
 
 
 # <HINT> Create a plain Python class `DealerReview` to hold review data
+class DealerReview:
+    def __init__(self, car_make, car_model, car_year, dealership, name, purchase, purchase_date, review, sentiment=None):
+        self.car_make = car_make
+        self.car_model = car_model
+        self.car_year = car_year
+        self.dealership = dealership
+        self.name = name
+        self.purchase = purchase
+        self.purchase_date = purchase_date
+        self.review = review
+        self.sentiment = sentiment
+    def __str__(self):
+        return "Review: " + self.review
