@@ -9,7 +9,11 @@ from django.utils.timezone import now
 # - Description
 # - Any other fields you would like to include in car make model
 # - __str__ method to print a car make object
-
+class CarMake (models.Model):
+    name = models.CharField(null=False, max_length=50)
+    description = models.CharField(max_length=1000)
+    def __str__(self):
+        return "Car make name: " + self.name
 
 # <HINT> Create a Car Model model `class CarModel(models.Model):`:
 # - Many-To-One relationship to Car Make model (One Car Make has many Car Models, using ForeignKey field)
@@ -19,8 +23,33 @@ from django.utils.timezone import now
 # - Year (DateField)
 # - Any other fields you would like to include in car model
 # - __str__ method to print a car make object
-
-
+class CarModel(models.Model):
+    name = models.CharField(null=False, max_length=50)
+    dealer_id = models.IntegerField()
+    carmake = models.ForeignKey(CarMake, on_delete=models.CASCADE)
+    SEDAN = 'sedan'
+    SUV = 'suv'
+    WAGON = 'wagon'
+    CONVERTIBLE = 'convertible'
+    MINIVAN = 'minivan'
+    SPORTCAR = 'sport_car'
+    CARTYPE = [
+        (SEDAN, 'Sedan'),
+        (SUV, 'SUV'),
+        (WAGON, 'Wagon'),
+        (CONVERTIBLE, 'Convertible'),
+        (MINIVAN, 'Minivan'),
+        (SPORTCAR,'Sport Car')
+    ]
+    car_type = models.CharField(
+        null=False,
+        max_length=25,
+        choices=CARTYPE,
+        default=SEDAN
+    )
+    year = models.DateField(null=True)
+    def __str__(self):
+        return "Car Model name: " + self.name
 # <HINT> Create a plain Python class `CarDealer` to hold dealer data
 class CarDealer:
     def __init__(self, address, city, full_name, id, lat, long, short_name, st, state, zip):
@@ -45,8 +74,7 @@ class CarDealer:
         self.zip = zip
     def __str__(self):
         return "Dealer name: " + self.full_name
-    def getfull_name(self):
-        return self.full_name
+
 
 
 # <HINT> Create a plain Python class `DealerReview` to hold review data
