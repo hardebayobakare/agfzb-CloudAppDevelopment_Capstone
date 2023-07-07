@@ -2,7 +2,7 @@ from django.shortcuts import render
 from django.http import HttpResponseRedirect, HttpResponse
 from django.contrib.auth.models import User
 from django.shortcuts import get_object_or_404, render, redirect
-# from .models import related models
+from .models import CarModel
 from .restapis import get_dealers_from_cf, get_reviews_from_cf, post_review
 from django.contrib.auth import login, logout, authenticate
 from django.contrib import messages
@@ -20,6 +20,14 @@ logger = logging.getLogger(__name__)
 def about(request):
     return render(request, 'djangoapp/about.html') 
 
+def add_review_page(request, dealer_id):
+    context = {}
+    car_models = CarModel.objects.filter(dealer_id=dealer_id)
+    print(list(car_models))
+    dealer = get_dealer_details(request, dealer_id)
+    context['cars'] = car_models
+    # print(dealer)
+    return render(request, 'djangoapp/add_review.html', context) 
 # Create a `contact` view to return a static contact page
 def contact(request):
     return render(request, 'djangoapp/contact.html') 
@@ -79,10 +87,11 @@ def get_dealerships(request):
         # Get dealers from the URL
         dealerships = get_dealers_from_cf(url)
         # Concat all dealer's short name
-        dealer_names = ' '.join([dealer.short_name for dealer in dealerships])
+        # dealer_names = ' '.join([dealer.short_name for dealer in dealerships])
         # Return a list of dealer short name
-        return HttpResponse(dealer_names)
-        # return render(request, 'djangoapp/index.html', context)
+        # return HttpResponse(dealer_names)
+        context['dealers'] = dealerships
+        return render(request, 'djangoapp/index.html', context)
 
 # Create a `get_dealer_details` view to render the reviews of a dealer
 def get_dealer_details(request, dealer_id):
@@ -95,8 +104,9 @@ def get_dealer_details(request, dealer_id):
         # Concat all dealer's short name
         # dealer_names = ' '.join([dealer. for dealer in dealerships])
         # Return a list of dealer short name
-        return HttpResponse(dealerships[0].full_name)
-        # return render(request, 'djangoapp/index.html', context)
+        context['dealers'] = dealerships
+        return dealerships[0]
+        # return render(request, 'djangoapp/dealer_detail.html', context)
 
 def get_review(request, dealer_id):
     context = {}
@@ -104,11 +114,15 @@ def get_review(request, dealer_id):
         url = "https://us-east.functions.appdomain.cloud/api/v1/web/372df87c-dfe3-4ca8-b3fc-643d093167ce/dealership-package/review"
         # Get dealers from the URL
         payload = {'dealerID': dealer_id}
+        dealer = get_dealer_details(request, dealer_id)
         reviews = get_reviews_from_cf(url, payload)
         # Concat all dealer's short name
         # dealer_names = ' '.join([dealer. for dealer in dealerships])
         # Return a list of dealer short name
-        return HttpResponse(reviews)
+        context['reviews'] = reviews
+        context['dealer'] = dealer.full_name
+        context['dealer_id'] = dealer_id
+        return render(request, 'djangoapp/dealer_details.html', context)
 
 def get_reviews(request):
     context = {}

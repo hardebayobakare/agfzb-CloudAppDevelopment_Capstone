@@ -4,13 +4,95 @@
     <meta charset="UTF-8">
     {% load static %}
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.5.0/css/bootstrap-datepicker.css" rel="stylesheet">
+    <!-- <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.5.0/css/bootstrap-datepicker.css" rel="stylesheet"> -->
     <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.5.0/js/bootstrap-datepicker.js"></script>
-
+    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.5.0/js/bootstrap-datepicker.js"></script> -->
+    <!-- Include Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <!-- Include jQuery -->
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+    <!-- Include Bootstrap Datepicker -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/css/bootstrap-datepicker.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/js/bootstrap-datepicker.min.js"></script>
 </head>
     <body>
+        <style>
+            .form-control-sm {
+                width: 30%;
+            }
+            .form-group-inline {
+                display: flex;
+                align-items: center;
+            }
+
+            .form-group-inline label {
+                margin-right: 10px;
+            }
+        </style>
+        <nav class="navbar navbar-expand-lg navbar-light bg-light">
+            <a class="navbar-brand" href="#">Dealership Review</a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+              <span class="navbar-toggler-icon"></span>
+            </button>
+          
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+              <ul class="navbar-nav mr-auto">
+                <li class="nav-item active">
+                  <a class="nav-link" href="{% url 'djangoapp:index' %}">Home <span class="sr-only">(current)</span></a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="{% url 'djangoapp:about' %}">About us</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'djangoapp:contact' %}">Contact us</a>
+                </li>     
+              </ul>
+              {% if user.is_authenticated %}
+              <li>
+                <a class="btn btn-link" href="#">({{ user.username }})</a>
+                <a class="btn btn-link" href="{% url 'djangoapp:logout' %}">Logout</a>
+              </li>
+              {% else %}
+              <form class="form-inline my-2 my-lg-0" action="{% url 'djangoapp:login' %}" method="post">
+                {% csrf_token %}
+                <input class="form-control mr-sm-2" type="text" placeholder="Username" name="username" aria-label="Username">
+                <input class="form-control mr-sm-2" type="password" placeholder="Password" name="psw" aria-label="Password">
+                <button class="btn btn-primary my-2 my-sm-0" type="submit">Login</button>
+                <a class="btn btn-link" href="{% url 'djangoapp:registration' %}">Sign Up</a>
+              </form>
+              {% endif %}
+            </div>
+          </nav>
     <!--Add review form here -->
+    <form action="{% url 'djangoapp:review' %}" method="post">
+        {% csrf_token %}
+        <div class="form-group">
+          <label for="content"><b>Enter the review content:</b></label>
+          <textarea class="form-control" id="content" name="content" rows="2" required></textarea>
+        </div>
+        <div class="form-group form-check">
+          <input class="form-check-input" type="checkbox" name="purchasecheck" id="purchasecheck">
+          <label class="form-check-label" for="purchasecheck">Has purchased the car from...? <span style="color: gray">(select purchased car information below if checked)</span></label>
+        </div>
+        <div class="form-group-inline">
+            <label for="car"><b>Select your car (model-make-year):</b></label>
+            <select class="form-control form-control-sm" name="car" id="car" required>
+                {% for car in cars %}
+                    <option selected value={{car.id}}>{{car.name}}-{{car.car_type}}-{{ car.year|date:"Y" }}</option>
+                {% endfor %}
+            </select>
+        </div><br>
+        <div class="form-group">
+          <label for="purchasedate"><b>Select Your Purchase Date:</b></label>
+          <input class="form-control form-control-sm date-own" type="text" name="purchasedate" id="purchasedate">
+        </div>
+        <button type="submit" class="btn btn-primary">Submit</button>
+    </form>
     </body>
+    <script type="text/javascript">
+        $('.date-own').datepicker({
+           format: 'mm/dd/yyyy'
+         });
+   </script>
 </html>

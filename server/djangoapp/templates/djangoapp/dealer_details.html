@@ -8,11 +8,78 @@
 </head>
 
     <body>
+        <nav class="navbar navbar-expand-lg navbar-light bg-light">
+            <a class="navbar-brand" href="#">Dealership Review</a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+              <span class="navbar-toggler-icon"></span>
+            </button>
+          
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+              <ul class="navbar-nav mr-auto">
+                <li class="nav-item active">
+                  <a class="nav-link" href="{% url 'djangoapp:index' %}">Home <span class="sr-only">(current)</span></a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="{% url 'djangoapp:about' %}">About us</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'djangoapp:contact' %}">Contact us</a>
+                </li>     
+              </ul>
+              {% if user.is_authenticated %}
+              <li>
+                <a class="btn btn-link" href="#">({{ user.username }})</a>
+                <a class="btn btn-link" href="{% url 'djangoapp:logout' %}">Logout</a>
+              </li>
+              {% else %}
+              <form class="form-inline my-2 my-lg-0" action="{% url 'djangoapp:login' %}" method="post">
+                {% csrf_token %}
+                <input class="form-control mr-sm-2" type="text" placeholder="Username" name="username" aria-label="Username">
+                <input class="form-control mr-sm-2" type="password" placeholder="Password" name="psw" aria-label="Password">
+                <button class="btn btn-primary my-2 my-sm-0" type="submit">Login</button>
+                <a class="btn btn-link" href="{% url 'djangoapp:registration' %}">Sign Up</a>
+              </form>
+              {% endif %}
+            </div>
+          </nav>
 
     <!--Add a nav bar here -->
 
     <!-- Add reviews as cards -->
-
+    <h3> Reviews for <b>{{ dealer }}</b></h3>
+        {% if reviews%}
+        <div class="row">  
+          <div class="card-columns">
+            {% for review in reviews%}
+            <div class="col-sm-6">
+                <div class="card" style="width: 20rem;">
+                    <div class="card-header">
+                        {% if review.sentiment == 'positive'%}
+                        <img class="card-img-left" style="width: 8%; height: 8%" src="{{MEDIA_URL}}/emoji/positive.png">
+                        {% elif review.sentiment == 'negative'%}
+                        <img class="card-img-left" style="width: 8%; height: 8%" src="{{MEDIA_URL}}/emoji/negative.png">
+                        {% else %}
+                        <img class="card-img-left" style="width: 8%; height: 8%" src="{{MEDIA_URL}}/emoji/neutral.png">
+                        {% endif %}
+                    </div>
+                    <div class="card-body">
+                        <h5 class="card-title">{{ review.car_make }}, {{ review.car_model }}</h5>
+                        <h5 class="card-subtitle">{{ review.car_year }}</h5>
+                        <p class="card-text">{{ review.review }}.</p>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+        {% else %}
+        <div>
+            <h6> There are no reviews for {{ dealer }}</h6>
+        </div>
+        {% endif %}
+        <a href="{% url 'djangoapp:add_review' dealer_id %}">
+            <button type="button" class="btn btn-primary btn-block">Add New Review</button>
+        </a>
     </body>
 
 </html>

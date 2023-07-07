@@ -88,6 +88,7 @@ def get_reviews_from_cf(url, payload=None):
         else:
             reviews = json_result
             for review in reviews:
+                print(review)
                 sentiment = analyze_review_sentiments(review["review"])
                 dealer_obj = DealerReview(car_make=review["car_make"], car_model=review["car_model"],
                                     car_year=review["car_year"], dealership=review["dealership"], name=review["name"],
