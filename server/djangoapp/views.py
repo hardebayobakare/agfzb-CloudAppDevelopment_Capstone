@@ -23,9 +23,9 @@ def about(request):
 def add_review_page(request, dealer_id):
     context = {}
     car_models = CarModel.objects.filter(dealer_id=dealer_id)
-    print(list(car_models))
     dealer = get_dealer_details(request, dealer_id)
     context['cars'] = car_models
+    context['dealer_id'] = dealer_id
     # print(dealer)
     return render(request, 'djangoapp/add_review.html', context) 
 # Create a `contact` view to return a static contact page
@@ -136,22 +136,29 @@ def get_reviews(request):
         return HttpResponse(reviews)
         # return render(request, 'djangoapp/index.html', context)
 
-def add_review(request, dealer_id):
+def add_review(request):
     if request.method == "POST":
         url = "https://us-east.functions.appdomain.cloud/api/v1/web/372df87c-dfe3-4ca8-b3fc-643d093167ce/dealership-package/review"
-        dealership = dealer_id
+        dealership = request.POST['dealer_id']
         name = request.POST["name"]
-        purchase = request.POST["purchase"]
+        car_id = request.POST["car"]
+        car = get_object_or_404(CarModel, pk=car_id)
+        purchase = "false"
+        if request.POST["purchasecheck"]:
+            purchase = "true"
         purchase_date = request.POST["purchase_date"]
-        review = request.POST["review"]
+        review = request.POST["content"]
         payload = {
-            "dealership": dealer_id, 
-            "name": request.POST["name"],
-            "purchase": request.POST["purchase"], 
-            "purchase_date": request.POST["purchase_date"],
-            "review": request.POST["review"]
+            "dealership": int(dealership.replace("/", "")), 
+            "car_make": car.carmake.name, 
+            "car_model": car.name,
+            "car_year": car.year.strftime("%Y"),
+            "name": name,
+            "purchase": purchase, 
+            "purchase_date": purchase_date,
+            "review": review
         }
-        response = post_review(url, json.dumps(payload))
+        response = post_review(url, payload)
         return HttpResponse(response)
 
 

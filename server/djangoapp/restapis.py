@@ -31,11 +31,13 @@ def post_request(url, json_payload):
     try:
         # Call post method of requests library with URL and parameters
         response = requests.post(url, headers={'Content-Type': 'application/json'},
-                                    params=payload)
+                                    data=json.dumps(json_payload))
         status_code = response.status_code
         print("With status {} ".format(status_code))
-        json_data = json.loads(response.text)
-        return json_data
+        if status_code == 200:
+            return True
+        else:
+            return False
     except:
         # If any error occurs
         print("Network exception occurred")
@@ -120,10 +122,13 @@ def analyze_review_sentiments(dealerreview):
     params = {}
     params["text"] = dealerreview
     json_result = get_request(url, params)
-    return json_result["label"]
+    if json_result["label"]:
+        return json_result["label"]
+    else:
+        return "Too Many Request Error"
 
-def post_review(url, json_payload):
-    result = post_request(url, json_payload)
+def post_review(url, payload):
+    result = post_request(url, payload)
     return result
 
 
